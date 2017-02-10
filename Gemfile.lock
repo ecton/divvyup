@@ -1,0 +1,29 @@
+PATH
+  remote: .
+  specs:
+    divvyup (0.0.1)
+      json
+      redis
+      semantic_logger
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    concurrent-ruby (1.0.4)
+    json (1.8.3)
+    redis (3.3.3)
+    semantic_logger (3.4.1)
+      concurrent-ruby (~> 1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (>= 1.0.0)
+  divvyup!
+  json
+  redis
+  semantic_logger
+
+BUNDLED WITH
+   1.14.3
