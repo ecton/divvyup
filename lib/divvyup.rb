@@ -1,5 +1,9 @@
+# frozen_string_literal: true
 require 'redis'
 
+# DivvyUp houses all DivvyUp functionality, and exposes simple singleton-style
+# interactions for ease of use, although it is possible to instantiate
+# DivvyUp classes without relying on the singleton Redis/Service instances.
 class DivvyUp
   class << self
     attr_accessor :redis

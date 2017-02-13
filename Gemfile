@@ -1,8 +1,15 @@
 # frozen_string_literal: true
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 gemspec
 
+gem 'json'
 gem 'redis'
 gem 'semantic_logger'
-gem 'json'
+
+group :test, :development do
+  gem 'fakeredis', require: 'fakeredis/rspec'
+  gem 'rspec'
+  gem 'rubocop'
+  gem 'simplecov'
+end

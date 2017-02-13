@@ -1,5 +1,7 @@
+# frozen_string_literal: true
 require 'divvyup/utils'
 
+# Worker defines the logic of how work is processed
 class DivvyUp::Worker
   include DivvyUp::Utils
   def initialize(queues:, service: nil)
@@ -9,29 +11,47 @@ class DivvyUp::Worker
   end
 
   attr_reader :queues, :service, :worker_id
+  attr_accessor :on_error
 
-  def work!
+  attr_writer :checkin_interval
+  def checkin_interval
+    @checkin_interval || 30
+  end
+
+  attr_writer :delay_after_internal_error
+  def delay_after_internal_error
+    @delay_after_internal_error || 5
+  end
+
+  def work!(forever = true)
     background_check_in
-    while true
+    loop do
       begin
         retrieve_and_execute_work
-      #rescue => ex
-      #  log(:error,
-      #    'Error while listening for work',
-      #    exception: ex)
-      #  sleep 5
+      rescue => ex
+        log(:error,
+            'Error while listening for work',
+            exception: ex.message,
+            backtrace: ex.backtrace)
+        sleep delay_after_internal_error
       end
+      break unless forever
     end
   end
 
-private
+  private
+
   def background_check_in
-    Thread.new {
-      while true
-        @service.worker_check_in(self) rescue nil
-        sleep 30
+    @background_thread ||= Thread.new do
+      loop do
+        begin
+          @service.worker_check_in(self)
+        rescue
+          nil
+        end
+        sleep checkin_interval
       end
-    }
+    end
   end
 
   def retrieve_and_execute_work
@@ -54,6 +74,7 @@ private
       result
     rescue => exc
       @service.work_failed(self, work, exc)
+      on_error&.call(exc)
     end
   end
 end

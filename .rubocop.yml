@@ -1,0 +1,8 @@
+Metrics/LineLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 20
+
+Style/ClassAndModuleChildren:
+  Enabled: false

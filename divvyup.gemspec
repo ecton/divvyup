@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require File.expand_path('lib/divvyup/version')
 
 Gem::Specification.new do |s|
@@ -10,7 +11,7 @@ Gem::Specification.new do |s|
   s.files       = `git ls-files`.split("\n")
   s.homepage    =
     'http://github.com/nilobject/divvyup'
-  s.license       = 'MIT'
+  s.license = 'MIT'
 
   s.require_path = 'lib'
 

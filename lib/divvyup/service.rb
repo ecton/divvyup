@@ -1,6 +1,8 @@
+# frozen_string_literal: true
 require 'divvyup/utils'
 require 'json'
 
+# Service is responsible for abstracting all of the redis interactions.
 class DivvyUp::Service
   include DivvyUp::Utils
 
@@ -11,7 +13,7 @@ class DivvyUp::Service
 
   def enqueue(job_class:, args: [])
     log(:trace, 'Enqueuing work', queue: job_class.queue, namespace: @namespace, job_class: job_class, args: args)
-    @redis.lpush("#{@namespace}::queue::#{job_class.queue}",{
+    @redis.lpush("#{@namespace}::queue::#{job_class.queue}", {
       class: job_class.name,
       args: args
     }.to_json)
@@ -27,7 +29,7 @@ class DivvyUp::Service
     @redis.hset("#{@namespace}::worker::#{worker.worker_id}::job", 'work', work.to_json)
   end
 
-  def work_finished(worker, work)
+  def work_finished(worker, _work)
     @redis.del "#{@namespace}::worker::#{worker.worker_id}::job"
   end
 
@@ -45,8 +47,12 @@ class DivvyUp::Service
     reclaim_stuck_work(worker) || retrieve_new_work(worker)
   end
 
-private
-  def reclaim_stuck_work(worker)
+  private
+
+  def reclaim_stuck_work(_worker)
+    # TODO: We need to look for workers that haven't checked in recently.
+    # If we find any, we will remove them, but first we'll see if they were
+    # in the middle of a job. If they were, we will re-queue it first.
     nil
   end
 
