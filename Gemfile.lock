@@ -20,6 +20,7 @@ GEM
       ast (~> 2.2)
     powerpack (0.1.1)
     rainbow (2.2.1)
+    rake (10.4.2)
     redis (3.3.3)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
@@ -58,6 +59,7 @@ DEPENDENCIES
   divvyup!
   fakeredis
   json
+  rake
   redis
   rspec
   rubocop

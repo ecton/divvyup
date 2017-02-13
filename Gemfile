@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'json'
+gem 'rake'
 gem 'redis'
 gem 'semantic_logger'
 
