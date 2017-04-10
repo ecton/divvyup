@@ -19,9 +19,7 @@ class DivvyUp
     attr_accessor :on_error
 
     def service
-      service = Service.new(redis: redis, namespace: namespace)
-      service.on_error = @on_error
-      service
+      Service.new(redis: redis, namespace: namespace)
     end
   end
 end
