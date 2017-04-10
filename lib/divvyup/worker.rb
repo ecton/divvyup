@@ -60,7 +60,7 @@ class DivvyUp::Worker
       log(:info, 'Received work', work: work)
       execute_work work
     else
-      log(:trace, 'No work found')
+      log(:info, 'No work found')
       sleep 5
     end
   end
