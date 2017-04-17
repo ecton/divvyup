@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    divvyup (0.0.5)
+    divvyup (0.0.6)
       json
       redis
       semantic_logger

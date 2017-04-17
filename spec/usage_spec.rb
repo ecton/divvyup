@@ -4,6 +4,8 @@ require 'divvyup'
 
 DivvyUp.redis = FakeRedis::Redis.new
 DivvyUp.namespace = 'testing'
+SemanticLogger.default_level = :trace if ENV['DEBUG']
+SemanticLogger.add_appender(io: $stdout, formatter: :color) if ENV['DEBUG']
 
 # In general I support smaller test methods covering individual chunks of functionality
 # However, I threw this project together rather quickly, and originally wasn't going to
@@ -38,7 +40,7 @@ RSpec.describe DivvyUp do
       worker.checkin_interval = 1
       worker.delay_after_internal_error = 0
 
-      # Verify simple text passes
+      # Verify simple test passes
       RspecJob.perform_async 'pass'
       worker.work!(false)
       expect(RspecJob.counters).to_not be_nil
@@ -68,6 +70,26 @@ RSpec.describe DivvyUp do
       worker = DivvyUp::Worker.new(service: service, queues: ['test'])
       expect(service).to receive(:worker_check_in)
       worker.work!(false)
+    end
+
+    it 'stuck work is reclaimed' do
+      DivvyUp.redis.hset('testing::workers', 'testworker1', 0)
+      DivvyUp.redis.hset('testing::worker::testworker1', 'queues', ['test'].to_json)
+      DivvyUp.redis.hset('testing::worker::testworker1::job', 'started_at', Time.now.to_i)
+      DivvyUp.redis.hset('testing::worker::testworker1::job', 'work', {
+        class: 'RspecJob',
+        args: ['reclaimed'],
+        queue: 'test'
+      }.to_json)
+
+      worker = DivvyUp::Worker.new(queues: ['test'])
+      worker.checkin_interval = 1
+      worker.delay_after_internal_error = 0
+
+      # Verify simple test passes
+      worker.work!(false)
+      expect(RspecJob.counters).to_not be_nil
+      expect(RspecJob.counters['reclaimed']).to eq(1)
     end
   end
 end
