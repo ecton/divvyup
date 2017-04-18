@@ -13,6 +13,7 @@ class DivvyUp::Service
 
   def enqueue(job_class:, args: [])
     log(:trace, 'Enqueuing work', queue: job_class.queue, namespace: @namespace, job_class: job_class, args: args)
+    @redis.sadd("#{@namespace}::queues", 'job_class.queue')
     @redis.lpush("#{@namespace}::queue::#{job_class.queue}", {
       class: job_class.name,
       args: args,
@@ -65,7 +66,7 @@ class DivvyUp::Service
     job = @redis.hget("#{@namespace}::worker::#{worker_id}::job", 'work')
     if job
       job = JSON.parse(job)
-      log(:trace, 'Requeuing reaped work', id: worker_id, job: job)
+      log(:info, 'Requeuing reaped work', id: worker_id, job: job)
       @redis.lpush("#{@namespace}::queue::#{job['queue']}", job.to_json)
     end
     @redis.del("#{@namespace}::worker::#{worker_id}::job")
